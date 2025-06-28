@@ -580,8 +580,11 @@ function App() {
     }
   };
 
+  const alreadyGuessed = status === 'locked';
+
   return (
     <div className="game-container">
+      <div className="nse-stripes"></div>
       <h1 className="game-title">Networkle</h1>
       <h2>Guess the UK Rail Station</h2>
       <p>New station every day. {MAX_GUESSES} guesses per day.</p>
@@ -591,6 +594,10 @@ function App() {
         <div className="locked">{message}</div>
       ) : status === 'locked' ? (
         <div className="locked">{message}</div>
+      ) : alreadyGuessed ? (
+        <div className="game-message">
+          You have already played today! Come back tomorrow for a new station.
+        </div>
       ) : (
         <>
           <div className="wordle-grid">
