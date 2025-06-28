@@ -306,6 +306,34 @@ footer {
   background: var(--nse-blue);
 }
 
+.game-message {
+  background: var(--nse-white);
+  color: var(--nse-blue);
+  border: 2.5px solid var(--nse-red);
+  border-radius: 0.7em;
+  box-shadow: 0 2px 8px #0002;
+  padding: 1.2em 1.2em 1em 1.2em;
+  margin: 1.5em auto 1.5em auto;
+  max-width: 500px;
+  font-size: 1.25em;
+  font-weight: bold;
+  text-align: center;
+  letter-spacing: 0.04em;
+  font-family: 'Segoe UI', 'Arial', 'Helvetica Neue', Helvetica, sans-serif;
+}
+
+.game-message.success {
+  border-color: var(--nse-blue);
+  color: var(--nse-white);
+  background: var(--nse-blue);
+}
+
+.game-message.fail {
+  border-color: var(--nse-red);
+  color: var(--nse-white);
+  background: var(--nse-red);
+}
+
 @media (max-width: 600px) {
   .game-container {
     padding: 0.5em 0.1em 2em 0.1em;
