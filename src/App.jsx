@@ -582,7 +582,7 @@ function App() {
 
   return (
     <div className="game-container">
-      <h1 className="game-title">Stationle</h1>
+      <h1 className="game-title">Networkle</h1>
       <h2>Guess the UK Rail Station</h2>
       <p>New station every day. {MAX_GUESSES} guesses per day.</p>
       {status === 'loading' || maxLen === 0 ? (

@@ -1,3 +1,13 @@
+:root {
+  --nse-red: #e41f26;
+  --nse-blue: #0056a6;
+  --nse-light-grey: #b1b3b3;
+  --nse-dark-grey: #4d4d4f;
+  --nse-white: #ffffff;
+  --nse-yellow: #ffc72c;
+  --nse-stripe-grey: #b1b3b3;
+}
+
 html, body, #root {
   height: 100%;
   min-height: 100vh;
@@ -6,24 +16,37 @@ html, body, #root {
   box-sizing: border-box;
 }
 body {
-  background: linear-gradient(135deg, #1a233a 0%, #2b3a55 100%);
-  overflow: hidden;
-  width: 100vw;
+  background: var(--nse-blue);
+  color: var(--nse-blue);
+  font-family: 'Segoe UI', 'Arial', 'Helvetica Neue', Helvetica, sans-serif;
 }
 #root {
+  background: var(--nse-blue);
+  color: var(--nse-blue);
+  box-shadow: 0 0 24px 0 #0002;
+  border-radius: 0.7em;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
   width: 100vw;
-}
-
-#root {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 2.5rem 1rem 2rem 1rem;
   text-align: center;
+  border: 4px solid var(--nse-red);
+}
+
+/* NSE diagonal stripe motif */
+.nse-stripes {
+  width: 100vw;
+  max-width: 1280px;
+  height: 1.2em;
+  background: linear-gradient(120deg, var(--nse-stripe-grey) 0 18%, var(--nse-red) 18% 38%, var(--nse-blue) 38% 60%, var(--nse-white) 60% 100%);
+  margin-bottom: 1.2em;
+  border-top-left-radius: 0.7em;
+  border-top-right-radius: 0.7em;
 }
 
 .logo {
@@ -63,41 +86,69 @@ body {
 }
 
 .game-container {
-  min-height: 100vh;
-  min-width: 100vw;
+  min-height: unset;
+  min-width: unset;
+  width: 100%;
+  max-width: 1280px;
+  box-sizing: border-box;
+  padding-bottom: 0.5em;
+  margin: 0 auto;
+  margin-top: 0.5em;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   background: none;
-  box-sizing: border-box;
-  padding-bottom: 2em;
 }
 
 .game-title {
-  font-size: 2.2em;
+  background: var(--nse-white);
+  color: var(--nse-blue);
+  padding: 0.8em 0 0.4em 0;
+  margin-bottom: -3.5em;
+  margin-top: 2em;
+  font-size: 2.5em;
   font-weight: bold;
-  letter-spacing: 0.15em;
-  margin-bottom: 1.2em;
-  margin-top: 0.2em;
-  color: #fff;
-  text-shadow: 0 2px 8px #000a, 0 0 2px #f9d923;
-  font-family: 'Segoe UI', 'Arial', sans-serif;
+  letter-spacing: 0.18em;
+  font-family: 'Segoe UI', 'Arial', 'Helvetica Neue', Helvetica, sans-serif;
+  border-top-left-radius: 0.7em;
+  border-top-right-radius: 0.7em;
+  position: relative;
+  text-shadow: 1px 2px 0 var(--nse-white), 0 2px 8px var(--nse-blue);
+  border-bottom: 0.4em solid var(--nse-blue);
+  box-shadow: 0 2px 0 var(--nse-red);
+}
+.game-title::after {
+  content: '';
+  display: block;
+  height: 0.35em;
+  background: linear-gradient(120deg, var(--nse-stripe-grey) 0 18%, var(--nse-red) 18% 38%, var(--nse-blue) 38% 60%, var(--nse-white) 60% 100%);
+  width: 100%;
+  position: absolute;
+  left: 0;
+  bottom: -0.35em;
+  border-bottom-left-radius: 0.7em;
+  border-bottom-right-radius: 0.7em;
 }
 
 h2 {
-  color: #f9d923;
-  font-family: 'Segoe UI', 'Arial', sans-serif;
+  color: var(--nse-blue);
+  margin-top: 1.2em;
   margin-bottom: 0.5em;
-  margin-top: 0.2em;
 }
 
 .wordle-grid {
+  background: var(--nse-white);
+  border-radius: 0.7em;
+  box-shadow: 0 4px 16px #0002;
+  padding: 1.5em 0.7em 1.2em 0.7em;
+  margin-top: 1.5em;
+  margin-bottom: 0.7em;
   display: flex;
   flex-direction: column;
-  gap: 0.3em;
-  margin: 2em 0 1.5em 0;
+  gap: 0.4em;
   align-items: center;
+  border: 2.5px solid var(--nse-blue);
 }
 
 .wordle-row {
@@ -107,42 +158,46 @@ h2 {
 }
 
 .wordle-cell {
-  width: 3em;
-  height: 3em;
+  width: 3.2em;
+  height: 3.2em;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5em;
+  font-size: 1.6em;
   font-weight: bold;
-  border: 2.5px solid #f9d923;
-  background: #232b3b;
-  color: #fff;
-  border-radius: 0.4em;
+  border: 3px solid var(--nse-light-grey);
+  background: var(--nse-light-grey);
+  color: var(--nse-blue);
+  border-radius: 0.5em;
   text-transform: uppercase;
-  transition: background 0.2s, border 0.2s;
+  transition: background 0.2s, border 0.2s, color 0.2s;
   box-sizing: border-box;
-  box-shadow: 0 2px 8px #0004;
+  box-shadow: 0 2px 8px #0001;
 }
 
 .wordle-cell.correct {
-  background: #6aaa64;
-  border-color: #6aaa64;
-  color: #fff;
+  background: var(--nse-blue);
+  border-color: var(--nse-red);
+  color: var(--nse-white);
+  text-shadow: 1px 1px 0 var(--nse-blue);
 }
 .wordle-cell.present {
-  background: #c9b458;
-  border-color: #c9b458;
-  color: #fff;
+  background: var(--nse-red);
+  border-color: var(--nse-blue);
+  color: var(--nse-white);
+  text-shadow: 1px 1px 0 var(--nse-blue);
 }
 .wordle-cell.absent {
-  background: #3a3a3c;
-  border-color: #3a3a3c;
-  color: #888;
+  background: var(--nse-stripe-grey);
+  border-color: var(--nse-blue);
+  color: var(--nse-blue);
+  opacity: 0.7;
 }
 
 .wordle-cell.active {
-  border-color: #f9d923;
-  background: #2b3a55;
+  border-color: var(--nse-yellow);
+  background: var(--nse-white);
+  color: var(--nse-blue);
   animation: pop 0.08s;
 }
 @keyframes pop {
@@ -151,15 +206,17 @@ h2 {
 }
 
 .keyboard {
-  width: 100vw;
-  max-width: 540px;
-  margin: 2.5em auto 1em auto;
-  padding: 0 0.5em;
-  box-sizing: border-box;
+  background: var(--nse-white);
+  border-radius: 0.7em;
+  box-shadow: 0 2px 8px #0001;
+  padding: 1.2em 0.7em 1.2em 0.7em;
+  margin-top: 0.2em;
+  margin-bottom: 1em;
   display: flex;
   flex-direction: column;
-  gap: 0.6em;
+  gap: 0.7em;
   align-items: center;
+  border: 2.5px solid var(--nse-blue);
 }
 
 .keyboard-row {
@@ -169,91 +226,84 @@ h2 {
 }
 
 .key {
-  min-width: 2.8em;
-  height: 3em;
-  background: #f9d923;
-  color: #232b3b;
-  border: none;
-  border-radius: 0.4em;
-  font-size: 1.1em;
+  min-width: 3em;
+  height: 3.2em;
+  background: var(--nse-blue);
+  color: var(--nse-white);
+  border: 2px solid var(--nse-light-grey);
+  border-radius: 0.5em;
+  font-size: 1.15em;
   font-weight: bold;
   margin: 0 0.08em;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s;
+  transition: background 0.2s, color 0.2s, border 0.2s;
   text-transform: uppercase;
-  box-shadow: 0 1px 2px #0002;
-  font-family: 'Segoe UI', 'Arial', sans-serif;
+  box-shadow: 0 1px 2px #0001;
+  font-family: 'Segoe UI', 'Arial', 'Helvetica Neue', Helvetica, sans-serif;
 }
 .key.correct {
-  background: #6aaa64;
-  color: #fff;
+  background: var(--nse-red);
+  color: var(--nse-white);
+  border-color: var(--nse-blue);
 }
 .key.present {
-  background: #c9b458;
-  color: #fff;
+  background: var(--nse-blue);
+  color: var(--nse-yellow);
+  border-color: var(--nse-red);
 }
 .key.absent {
-  background: #3a3a3c;
-  color: #888;
+  background: var(--nse-stripe-grey);
+  color: var(--nse-blue);
+  opacity: 0.5;
+  border-color: var(--nse-stripe-grey);
 }
 .key:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-.locked {
-  color: #c00;
-  font-weight: bold;
-  margin: 2em 0;
-}
-
-.answer {
-  margin: 1.5em 0 0.5em 0;
-  font-size: 1.1em;
-  color: #6aaa64;
-}
-
-.message {
-  margin-top: 1em;
-  min-height: 1.5em;
-  color: #f9d923;
-  font-weight: 500;
-}
-
 input[type="text"] {
-  padding: 0.5em 1em;
+  padding: 0.6em 1.1em;
   font-size: 1.1em;
-  border-radius: 0.4em;
-  border: 1.5px solid #444;
-  background: #222;
-  color: #fff;
+  border-radius: 0.5em;
+  border: 2px solid var(--nse-blue);
+  background: var(--nse-white);
+  color: var(--nse-blue);
   margin-right: 0.5em;
   outline: none;
   width: 70%;
   max-width: 260px;
+  font-family: 'Segoe UI', 'Arial', 'Helvetica Neue', Helvetica, sans-serif;
+  box-shadow: 0 1px 4px #0001;
 }
 
 button[type="submit"] {
-  padding: 0.5em 1.2em;
+  padding: 0.6em 1.3em;
   font-size: 1.1em;
-  border-radius: 0.4em;
+  border-radius: 0.5em;
   border: none;
-  background: #646cff;
-  color: #fff;
+  background: var(--nse-blue);
+  color: var(--nse-white);
   font-weight: bold;
   cursor: pointer;
   transition: background 0.2s;
+  box-shadow: 0 1px 4px #0001;
+  letter-spacing: 0.04em;
 }
 button[type="submit"]:disabled {
-  background: #444;
-  color: #888;
+  background: var(--nse-light-grey);
+  color: var(--nse-dark-grey);
   cursor: not-allowed;
 }
 
 footer {
   margin-top: 2em;
-  color: #888;
-  font-size: 0.9em;
+  color: var(--nse-white);
+  font-size: 0.95em;
+  border-top: 2px solid var(--nse-red);
+  padding-top: 1em;
+  letter-spacing: 0.03em;
+  background: var(--nse-blue);
 }
 
 @media (max-width: 600px) {
@@ -266,8 +316,8 @@ footer {
     gap: 0.4em;
   }
   .wordle-cell {
-    width: 2em;
-    height: 2em;
+    width: 2.2em;
+    height: 2.2em;
     font-size: 1.1em;
   }
   .key {
@@ -275,4 +325,15 @@ footer {
     height: 2.2em;
     font-size: 0.95em;
   }
+}
+
+/* NSE bar motif for header */
+.nse-bar {
+  width: 100vw;
+  max-width: 1280px;
+  height: 0.7em;
+  background: var(--nse-red);
+  border-top-left-radius: 0.7em;
+  border-top-right-radius: 0.7em;
+  margin-bottom: 1.2em;
 }
