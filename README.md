@@ -1,6 +1,6 @@
 # Raille: UK Rail Station Wordle Game
 
-Raille is a Wordle-like web game for UK rail stations. Each day, a new station is randomly picked from a list. The player has a limited number of guesses to identify the station. Browser cookies restrict players to one attempt per day. Built with React and Vite for a modern, clean UI.
+Raille is a Wordle-like web game for UK rail stations. Each day, a new station is randomly picked from a list. The player has a limited number of guesses to identify the station. Built with React and Vite for a modern, clean UI.
 
 ## Features
 
