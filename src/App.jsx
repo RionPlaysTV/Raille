@@ -592,11 +592,12 @@ function App() {
         <div className="loading">Loading stations...</div>
       ) : status === 'error' ? (
         <div className="locked">{message}</div>
-      ) : status === 'locked' ? (
-        <div className="locked">{message}</div>
-      ) : alreadyGuessed ? (
-        <div className="game-message">
-          You have already played today! Come back tomorrow for a new station.
+      ) : status === 'locked' || alreadyGuessed ? (
+        <div className="game-message" style={{marginTop: '3.5em', color: 'var(--nse-blue)', background: 'var(--nse-white)', zIndex: 2, position: 'relative'}}>
+          <b>You've already played today!</b>
+          <br />
+          Come back tomorrow for a new station.<br />
+          <span style={{fontWeight: 400, fontSize: '0.95em', color: '#555'}}>Refresh the page tomorrow for a new puzzle.</span>
         </div>
       ) : (
         <>

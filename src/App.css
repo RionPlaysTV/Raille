@@ -44,6 +44,7 @@ body {
   max-width: 1280px;
   height: 1.2em;
   background: linear-gradient(120deg, var(--nse-stripe-grey) 0 18%, var(--nse-red) 18% 38%, var(--nse-blue) 38% 60%, var(--nse-white) 60% 100%);
+  margin-top: 6em;
   margin-bottom: 1.2em;
   border-top-left-radius: 0.7em;
   border-top-right-radius: 0.7em;
@@ -106,7 +107,7 @@ body {
   color: var(--nse-blue);
   padding: 0.8em 0 0.4em 0;
   margin-bottom: -3.5em;
-  margin-top: 2em;
+  margin-top: 0em;
   font-size: 2.5em;
   font-weight: bold;
   letter-spacing: 0.18em;
