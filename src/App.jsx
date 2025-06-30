@@ -525,6 +525,13 @@ function App() {
       setStatus('locked');
       setMessage('You have already played today. Come back tomorrow!');
     }
+    // Set up a timer to reset at midnight
+    const now = new Date();
+    const msToMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 1) - now;
+    const midnightTimer = setTimeout(() => {
+      window.location.reload();
+    }, msToMidnight);
+    return () => clearTimeout(midnightTimer);
   }, [todayKey]);
 
   // Handle physical keyboard input
@@ -584,7 +591,6 @@ function App() {
 
   return (
     <div className="game-container">
-      <div className="nse-stripes"></div>
       <h1 className="game-title">Networkle</h1>
       <h2>Guess the UK Rail Station</h2>
       <p>New station every day. {MAX_GUESSES} guesses per day.</p>
@@ -592,12 +598,11 @@ function App() {
         <div className="loading">Loading stations...</div>
       ) : status === 'error' ? (
         <div className="locked">{message}</div>
-      ) : status === 'locked' || alreadyGuessed ? (
-        <div className="game-message" style={{marginTop: '3.5em', color: 'var(--nse-blue)', background: 'var(--nse-white)', zIndex: 2, position: 'relative'}}>
-          <b>You've already played today!</b>
-          <br />
-          Come back tomorrow for a new station.<br />
-          <span style={{fontWeight: 400, fontSize: '0.95em', color: '#555'}}>Refresh the page tomorrow for a new puzzle.</span>
+      ) : status === 'locked' ? (
+        <div className="locked">{message}</div>
+      ) : alreadyGuessed ? (
+        <div className="game-message">
+          You have already played today! Come back tomorrow for a new station.
         </div>
       ) : (
         <>
