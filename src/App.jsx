@@ -509,11 +509,23 @@ function getDailyStation() {
   return STATIONS[idx];
 }
 
+function getRandomStation() {
+  return STATIONS[Math.floor(Math.random() * STATIONS.length)];
+}
+
 function App() {
-  const [guess, setGuess] = useState('');
+  const [regularGuess, setRegularGuess] = useState('');
   const [guesses, setGuesses] = useState([]);
   const [status, setStatus] = useState('playing');
   const [message, setMessage] = useState('');
+  const [mode, setMode] = useState('regular'); // 'regular' or 'endless'
+  const [endlessScore, setEndlessScore] = useState(0);
+  const [endlessAnswerRaw, setEndlessAnswerRaw] = useState(getRandomStation());
+  const endlessAnswer = normalize(endlessAnswerRaw);
+  const [endlessGuesses, setEndlessGuesses] = useState([]);
+  const [endlessStatus, setEndlessStatus] = useState('playing');
+  const [endlessMessage, setEndlessMessage] = useState('');
+  const [endlessGuess, setEndlessGuess] = useState('');
   const todayKey = getTodayKey();
   const answerRaw = getDailyStation();
   const answer = normalize(answerRaw);
@@ -534,27 +546,55 @@ function App() {
     return () => clearTimeout(midnightTimer);
   }, [todayKey]);
 
+  // Endless mode: reset state on mode switch or restart
+  useEffect(() => {
+    if (mode === 'endless') {
+      setEndlessScore(0);
+      setEndlessAnswerRaw(getRandomStation());
+      setEndlessGuesses([]);
+      setEndlessStatus('playing');
+      setEndlessMessage('');
+    }
+  }, [mode]);
+
   // Handle physical keyboard input
   useEffect(() => {
     if (status !== 'playing') return;
     const onKeyDown = (e) => {
       if (e.ctrlKey || e.metaKey || e.altKey) return;
       if (e.key === 'Enter') {
-        if (guess.length === maxLen) handleGuess({ preventDefault: () => {} });
+        if (regularGuess.length === maxLen) handleGuess({ preventDefault: () => {} });
       } else if (e.key === 'Backspace') {
-        setGuess(g => g.slice(0, -1));
-      } else if (/^[a-zA-Z]$/.test(e.key) && guess.length < maxLen) {
-        setGuess(g => g + e.key.toUpperCase());
+        setRegularGuess(g => g.slice(0, -1));
+      } else if (/^[a-zA-Z]$/.test(e.key) && regularGuess.length < maxLen) {
+        setRegularGuess(g => g + e.key.toUpperCase());
       }
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [guess, status, maxLen]);
+  }, [regularGuess, status, maxLen, mode]);
+
+  // Keyboard input for endless mode
+  useEffect(() => {
+    if (mode !== 'endless' || endlessStatus !== 'playing') return;
+    const onKeyDown = (e) => {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      if (e.key === 'Enter') {
+        if (endlessGuess.length === endlessAnswer.length) handleEndlessGuess({ preventDefault: () => {} });
+      } else if (e.key === 'Backspace') {
+        setEndlessGuess(g => g.slice(0, -1));
+      } else if (/^[a-zA-Z]$/.test(e.key) && endlessGuess.length < endlessAnswer.length) {
+        setEndlessGuess(g => g + e.key.toUpperCase());
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [endlessGuess, endlessStatus, endlessAnswer, mode]);
 
   const handleGuess = (e) => {
     if (e) e.preventDefault();
     if (status !== 'playing') return;
-    const normGuess = guess;
+    const normGuess = regularGuess;
     if (normGuess.length !== maxLen) {
       setMessage(`Guess must be ${maxLen} letters.`);
       return;
@@ -571,57 +611,144 @@ function App() {
     } else {
       setMessage('Incorrect, try again!');
     }
-    setGuess('');
+    setRegularGuess('');
+  };
+
+  const handleEndlessGuess = (e) => {
+    if (e) e.preventDefault();
+    if (endlessStatus !== 'playing') return;
+    const normGuess = endlessGuess;
+    if (normGuess.length !== endlessAnswer.length) {
+      setEndlessMessage(`Guess must be ${endlessAnswer.length} letters.`);
+      return;
+    }
+    const newGuesses = [...endlessGuesses, normGuess];
+    setEndlessGuesses(newGuesses);
+    if (normGuess === endlessAnswer) {
+      setEndlessScore(s => s + 1);
+      setEndlessMessage('Correct! Next station...');
+      setTimeout(() => {
+        setEndlessAnswerRaw(getRandomStation());
+        setEndlessGuesses([]);
+        setEndlessGuess('');
+        setEndlessMessage('');
+      }, 1000);
+    } else if (newGuesses.length >= MAX_GUESSES) {
+      setEndlessStatus('lost');
+      setEndlessMessage(`Game Over! The station was: ${endlessAnswerRaw}`);
+    } else {
+      setEndlessMessage('Incorrect, try again!');
+    }
+    setEndlessGuess('');
   };
 
   const keyboardStatus = getKeyboardStatuses(guesses, answer);
+  const endlessKeyboardStatus = getKeyboardStatuses(endlessGuesses, endlessAnswer);
 
-  const handleVirtualKey = (key) => {
-    if (status !== 'playing') return;
-    if (key === 'ENTER') {
-      if (guess.length === maxLen) handleGuess({ preventDefault: () => {} });
-    } else if (key === '⌫' || key === 'Backspace') {
-      setGuess(g => g.slice(0, -1));
-    } else if (guess.length < maxLen && /^[A-Z]$/.test(key)) {
-      setGuess(g => g + key);
-    }
+  const handleModeChange = (m) => {
+    setMode(m);
+    setRegularGuess('');
+    setEndlessGuess('');
+    setMessage('');
   };
 
-  const alreadyGuessed = status === 'locked';
+  // Add a restart handler for endless mode
+  const handleRestartEndless = () => {
+    setEndlessScore(0);
+    setEndlessAnswerRaw(getRandomStation());
+    setEndlessGuesses([]);
+    setEndlessStatus('playing');
+    setEndlessMessage('');
+    setEndlessGuess('');
+  };
 
   return (
     <div className="game-container">
       <div className="nse-stripes"></div>
       <h1 className="game-title">Networkle</h1>
-      {status === 'loading' || maxLen === 0 ? (
-        <div className="loading">Loading stations...</div>
-      ) : status === 'error' ? (
-        <div className="locked">{message}</div>
-      ) : (status === 'locked' || alreadyGuessed) ? (
-        <div className="game-message" style={{marginTop: '3.5em', color: 'var(--nse-blue)', background: 'var(--nse-white)', zIndex: 2, position: 'relative'}}>
-          <b>You've already played today!</b>
-          <br />
-          Come back tomorrow for a new station.<br />
-          <span style={{fontWeight: 400, fontSize: '0.95em', color: '#555'}}>Refresh the page tomorrow for a new puzzle.</span>
-        </div>
+      <div className="mode-toggle">
+        <button onClick={() => handleModeChange('regular')} disabled={mode==='regular'}>Regular</button>
+        <button onClick={() => handleModeChange('endless')} disabled={mode==='endless'}>Endless</button>
+      </div>
+      {mode === 'regular' ? (
+        status === 'loading' || maxLen === 0 ? (
+          <div className="loading">Loading stations...</div>
+        ) : status === 'error' ? (
+          <div className="locked">{message}</div>
+        ) : (status === 'locked') ? (
+          <div className="game-message" style={{marginTop: '3.5em', color: 'var(--nse-blue)', background: 'var(--nse-white)', zIndex: 2, position: 'relative'}}>
+            <b>You've already played today!</b>
+            <br />
+            Come back tomorrow for a new station.<br />
+            <span style={{fontWeight: 400, fontSize: '0.95em', color: '#555'}}>Refresh the page tomorrow for a new puzzle.</span>
+          </div>
+        ) : (
+          <>
+            <h2 style={{color: 'var(--nse-blue)'}}>Guess the UK Rail Station</h2>
+            <p style={{color: 'var(--nse-blue)'}}>New station every day. {MAX_GUESSES} guesses per day.</p>
+            <div className="wordle-grid">
+              {[...Array(MAX_GUESSES)].map((_, rowIdx) => {
+                let g = guesses[rowIdx] || '';
+                let statuses = g ? getLetterStatuses(g, answer) : [];
+                // If this is the current guess row
+                if (rowIdx === guesses.length && status === 'playing') {
+                  g = regularGuess.padEnd(maxLen);
+                  statuses = Array(maxLen).fill('');
+                }
+                return (
+                  <div className="wordle-row" key={rowIdx}>
+                    {[...Array(maxLen)].map((_, colIdx) => (
+                      <div
+                        className={`wordle-cell ${statuses[colIdx] || ''} ${rowIdx === guesses.length && status === 'playing' && colIdx < regularGuess.length ? 'active' : ''}`}
+                        key={colIdx}
+                      >
+                        {g[colIdx] || ''}
+                      </div>
+                    ))}
+                  </div>
+                );
+              })}
+            </div>
+            <div className="keyboard">
+              {KEYBOARD_ROWS.map((row, i) => (
+                <div className="keyboard-row" key={i}>
+                  {row.map(key => (
+                    <button
+                      key={key}
+                      className={`key ${keyboardStatus[key] || ''}`}
+                      onClick={() => handleVirtualKey(key)}
+                      disabled={
+                        (key === 'ENTER' && (regularGuess.length !== maxLen || status !== 'playing')) ||
+                        (key === '⌫' && regularGuess.length === 0) ||
+                        (key.length === 1 && (regularGuess.length >= maxLen || status !== 'playing'))
+                      }
+                    >
+                      {key}
+                    </button>
+                  ))}
+                </div>
+              ))}
+            </div>
+            <div className="message">{message}</div>
+          </>
+        )
       ) : (
         <>
-          <h2 style={{color: 'var(--nse-blue)'}}>Guess the UK Rail Station</h2>
-          <p style={{color: 'var(--nse-blue)'}}>New station every day. {MAX_GUESSES} guesses per day.</p>
+          <h2 className="endless-title" style={{color: 'var(--nse-blue)'}}>Endless Mode: Guess the UK Rail Station</h2>
+          <div className="endless-score" style={{color: 'var(--nse-blue)', fontWeight: 'bold', marginBottom: '0.5em'}}>Score: {endlessScore}</div>
           <div className="wordle-grid">
             {[...Array(MAX_GUESSES)].map((_, rowIdx) => {
-              let g = guesses[rowIdx] || '';
-              let statuses = g ? getLetterStatuses(g, answer) : [];
-              // If this is the current guess row
-              if (rowIdx === guesses.length && status === 'playing') {
-                g = guess.padEnd(maxLen);
-                statuses = Array(maxLen).fill('');
+              let g = endlessGuesses[rowIdx] || '';
+              let statuses = g ? getLetterStatuses(g, endlessAnswer) : [];
+              if (rowIdx === endlessGuesses.length && endlessStatus === 'playing') {
+                g = endlessGuess.padEnd(endlessAnswer.length);
+                statuses = Array(endlessAnswer.length).fill('');
               }
               return (
                 <div className="wordle-row" key={rowIdx}>
-                  {[...Array(maxLen)].map((_, colIdx) => (
+                  {[...Array(endlessAnswer.length)].map((_, colIdx) => (
                     <div
-                      className={`wordle-cell ${statuses[colIdx] || ''} ${rowIdx === guesses.length && status === 'playing' && colIdx < guess.length ? 'active' : ''}`}
+                      className={`wordle-cell ${statuses[colIdx] || ''} ${rowIdx === endlessGuesses.length && endlessStatus === 'playing' && colIdx < endlessGuess.length ? 'active' : ''}`}
                       key={colIdx}
                     >
                       {g[colIdx] || ''}
@@ -637,12 +764,21 @@ function App() {
                 {row.map(key => (
                   <button
                     key={key}
-                    className={`key ${keyboardStatus[key] || ''}`}
-                    onClick={() => handleVirtualKey(key)}
+                    className={`key ${endlessKeyboardStatus[key] || ''}`}
+                    onClick={() => {
+                      if (endlessStatus !== 'playing') return;
+                      if (key === 'ENTER') {
+                        if (endlessGuess.length === endlessAnswer.length) handleEndlessGuess({ preventDefault: () => {} });
+                      } else if (key === '⌫' || key === 'Backspace') {
+                        setEndlessGuess(g => g.slice(0, -1));
+                      } else if (endlessGuess.length < endlessAnswer.length && /^[A-Z]$/.test(key)) {
+                        setEndlessGuess(g => g + key);
+                      }
+                    }}
                     disabled={
-                      (key === 'ENTER' && (guess.length !== maxLen || status !== 'playing')) ||
-                      (key === '⌫' && guess.length === 0) ||
-                      (key.length === 1 && (guess.length >= maxLen || status !== 'playing'))
+                      (key === 'ENTER' && (endlessGuess.length !== endlessAnswer.length || endlessStatus !== 'playing')) ||
+                      (key === '⌫' && endlessGuess.length === 0) ||
+                      (key.length === 1 && (endlessGuess.length >= endlessAnswer.length || endlessStatus !== 'playing'))
                     }
                   >
                     {key}
@@ -651,11 +787,15 @@ function App() {
               </div>
             ))}
           </div>
-          <div className="message">{message}</div>
+          <div className="message">{endlessMessage}</div>
+          {endlessStatus === 'lost' && (
+            <div className="game-message fail" style={{marginTop: '1em'}}>
+              <div>Game Over! Final Score: <b>{endlessScore}</b></div>
+              <div>The station was: <b>{endlessAnswerRaw}</b></div>
+              <button style={{marginTop: '1em'}} onClick={handleRestartEndless}>Restart Endless</button>
+            </div>
+          )}
         </>
-      )}
-      {(status === 'won' || status === 'lost') && (
-        <div className="answer">Today's station: <b>{answerRaw}</b></div>
       )}
       <footer>
         <p style={{marginTop: '2em', fontSize: '0.9em', color: '#888'}}>Made with React & Vite. Not affiliated with National Rail.</p>
